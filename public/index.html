@@ -1,0 +1,69 @@
+<!doctype html><html lang="th"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f3ecff"><title>SOULSHOOT</title>
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="manifest" href="/manifest.webmanifest"><link rel="apple-touch-icon" href="/icon.png">
+<meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="SOULSHOOT">
+<link rel="stylesheet" href="style.css"></head><body>
+<header class="top"><div class="logo">✦</div><div><h1>SOULSHOOT</h1><p>รวมช่วงเวลาของทุกคนไว้ในเฟรมเดียว</p></div></header>
+
+<div id="home">
+<section class="card invite" id="invite" hidden><h3 id="invTitle"></h3><p id="invSub" class="hint"></p>
+<input id="invName" placeholder="ใส่ชื่อของคุณ แล้วเข้าได้เลย" autocomplete="nickname"><button id="invGo" class="primary big" type="button">เข้าร่วมเลย</button><button id="invSkip" class="skip" type="button">ข้ามไปหน้าแรก</button></section>
+<section class="hero"><h2>สวัสดี 👋</h2><p>ถ่ายพร้อมเพื่อน แล้วรวมเป็น Moment เดียว</p>
+<input id="name" placeholder="ชื่อของคุณ">
+<div class="notif" id="notifRow"><span id="notifState" class="hint">กำลังตรวจสอบการแจ้งเตือน…</span><div class="acts"><button id="notifBtn" type="button" hidden>🔔 เปิดแจ้งเตือน</button><button id="notifTest" type="button" hidden>ทดสอบ</button></div></div></section>
+
+<nav class="tabs"><button class="on" data-tab="t1">📸 Live</button><button data-tab="t2">✨ Memory</button><button id="albumBtn" data-tab="t3">🖼️ Album</button></nav>
+
+<div class="panel" id="t1">
+<section class="card" id="stepGroup"><h3 class="step"><i id="s1">1</i>เลือกกลุ่ม</h3>
+<select id="groupSel"></select><p class="hint">ยังไม่มีกลุ่ม? สร้างใหม่ หรือใส่รหัสกลุ่มที่เพื่อนส่งให้</p>
+<div class="row"><div><input id="gName" placeholder="ชื่อกลุ่มใหม่"><button id="gCreate" class="primary">สร้างกลุ่ม</button></div>
+<div><input id="gCode" placeholder="รหัสกลุ่ม"><button id="gJoin">เข้ากลุ่ม</button></div></div>
+<div class="acts two"><button id="gMembers" type="button">👥 สมาชิก</button><button id="gInvite" type="button">🔗 ชวนเพื่อน (QR / ลิงก์)</button></div><div id="membersBox" class="sub" hidden></div></section>
+<section class="card" id="stepMoment"><h3 class="step"><i id="s2">2</i>นัดถ่ายรูปในกลุ่มนี้</h3><p id="lockMsg" class="hint">🔒 ต้องเลือกหรือเข้ากลุ่มก่อนในขั้นที่ 1</p>
+<input id="title" placeholder="ชื่อ Moment เช่น งานวันเกิด">
+<label class="hint" for="startBtn">วันและเวลาที่ถ่าย (เลือกได้ภายใน 3 เดือน)</label><button id="startBtn" class="datebtn" type="button" aria-haspopup="dialog"></button><input id="start" type="hidden">
+<button id="create" class="primary">🕒 สร้าง Moment</button><div id="dupBox"></div><div id="moments"></div></section>
+</div>
+
+<div class="panel" id="t2" hidden>
+<p id="needGroup" class="hint">🔒 ต้องเข้ากลุ่มก่อน (ไปที่แท็บ Live ขั้นที่ 1)</p><section class="card"><h3 class="step"><i>1</i>อัปโหลดรูปย้อนหลัง</h3>
+<p class="hint">เลือกรูปที่เคยถ่าย ระบบอ่านเวลาและตำแหน่งจากรูปให้เอง</p>
+<input id="mFiles" type="file" accept="image/*" multiple><input id="mTag" placeholder="tag (ไม่บังคับ เช่น graduation)">
+<label class="hint" for="mTime">เวลาที่ถ่าย (ใช้เฉพาะรูปที่ไม่มี EXIF)</label><input id="mTime" type="datetime-local">
+<button id="mUpload" class="primary">อัปโหลด</button><p id="mStatus"></p></section>
+<section class="card"><h3 class="step"><i>2</i>ให้ระบบจับกลุ่ม</h3>
+<button id="mFind">✨ หา Suggested Moment</button><div id="mSug"></div></section>
+</div>
+
+<div class="panel" id="t3" hidden><section class="card"><h3 class="step"><i>🖼️</i>Shared Album</h3><div id="albums"></div></section></div>
+</div>
+
+<div id="live" hidden><div class="col">
+<div class="bar"><button id="back" class="back" type="button">← กลับหน้าแรก</button><button id="liveInvite" class="back" type="button">🔗 ชวนเพื่อน</button><button id="liveCal" class="back" type="button" hidden>📅 ลงปฏิทิน</button></div>
+<section class="card live-head"><p id="info"></p><div id="cnt"></div></section>
+<div class="camwrap"><video id="cam" autoplay playsinline muted></video><button id="flip" hidden aria-label="สลับกล้องหน้า/หลัง">🔄</button></div><p id="camMsg" class="hint"></p>
+<label class="opt"><input type="checkbox" id="auto" checked> ถ่ายอัตโนมัติเมื่อถึงเวลา <select id="shots"><option value="1">1 รูป</option><option value="3" selected>3 รูป</option><option value="5">5 รูป</option></select></label>
+<button id="shot" class="primary big" disabled>📸 ถ่ายรูป</button>
+<h3 class="sec">รูปจากทุกคน · แตะเพื่อเลือกใส่เฟรม</h3><div id="grid"></div>
+<section class="card" id="voiceBox"><h3 class="step"><i>🎙️</i>เสียงของเรา</h3>
+<p class="hint">กดอัดเอง ได้สูงสุด 15 วินาที — ทุกคนในห้องฟังได้ และเอาไปแปะบนเฟรมได้</p>
+<div class="recrow"><button id="recBtn" class="primary" type="button">🎙️ เริ่มอัดเสียง</button><button id="recStop" class="stopb" type="button" hidden>⏹ หยุด</button><span id="recTime" class="rectime" hidden>0.0 / 15 วิ</span></div>
+<div id="recMeter" class="meter" hidden><i id="recLevel"></i></div>
+<div id="recReview" hidden><audio id="recAudio" controls></audio><div class="acts two"><button id="recUse" class="primary" type="button">ใช้เสียงนี้</button><button id="recAgain" type="button">อัดใหม่</button></div><button id="recDrop" class="skip" type="button">ทิ้ง ไม่ใช้</button></div>
+<p id="recMsg" class="hint" role="status"></p>
+<h4 class="stkh">เสียงจากทุกคน</h4><div id="voiceList"></div></section>
+</div><div class="col"><section class="card"><h3 class="step"><i>✦</i>สร้าง Frame</h3><p class="hint">เลือก Template</p><div id="tpls"></div><p class="hint">เฟรมลายพิเศษ 12 แบบ (จำนวนช่องตามเฟรม)</p><div id="tplImg"></div><p class="hint">เลือกฟิลเตอร์</p><div id="fltrs"></div><p id="pickInfo" class="hint"></p>
+<select id="layout"><option value="2x2">Grid 2×2</option><option value="1x3">Strip 3 รูป</option><option value="1x4">Strip 4 รูป</option><option value="3x2">Grid 3×2</option></select>
+<input id="fcolor" type="color" value="#ffd1dc"><input id="ftitle" placeholder="ข้อความบน Frame">
+<canvas id="fc"></canvas>
+<p class="hint">ลากรูปในช่องเพื่อขยับ · เลื่อนล้อเมาส์หรือหยิกสองนิ้วเพื่อซูม <button id="fresetph" type="button" class="linkbtn">รีเซ็ตตำแหน่งรูป</button></p>
+<div class="stk"><h4 class="stkh">✨ สติ๊กเกอร์</h4><div id="stkPal" class="pal"></div>
+<div class="stktext"><input id="stkText" placeholder="พิมพ์ข้อความสติ๊กเกอร์" maxlength="40"><input id="stkColor" type="color" value="#ff4f9a" hidden><div id="stkSw" class="sws"></div><button id="stkTextAdd" type="button">เพิ่มข้อความ</button></div>
+<label class="filebtn">🖼️ อัปโหลดสติ๊กเกอร์ของคุณ (PNG ใสพื้นหลังสวยสุด)<input id="stkFile" type="file" accept="image/*" hidden></label>
+<p class="hint">🔊 สติ๊กเกอร์เสียง — วางบนเฟรม แล้วเพื่อนกดฟังได้ที่หน้าแชร์</p><div id="stkVoices" class="pal"></div>
+<div id="stkBar" class="stkbar" hidden role="toolbar" aria-label="จัดการสติ๊กเกอร์ที่เลือก"><button type="button" data-a="smaller" aria-label="เล็กลง">−</button><button type="button" data-a="bigger" aria-label="ใหญ่ขึ้น">+</button><button type="button" data-a="left" aria-label="หมุนซ้าย">↺</button><button type="button" data-a="right" aria-label="หมุนขวา">↻</button><button type="button" data-a="flip" aria-label="พลิก">⇋</button><button type="button" data-a="front" aria-label="ขึ้นหน้า">⤒</button><button type="button" data-a="back" aria-label="ลงหลัง">⤓</button><button type="button" data-a="del" class="dangerb" aria-label="ลบ">🗑</button><button type="button" data-a="done">เสร็จ</button></div></div><div class="row"><button id="fprev">พรีวิว</button><button id="fsave" class="primary">บันทึก</button></div><p id="flink"></p></section></div>
+</div>
+<div id="banner" hidden role="alert"></div><div id="toast" hidden></div>
+<script src="/socket.io/socket.io.js"></script><script src="vendor/qrcode.js"></script><script src="app.js"></script><script src="groups.js"></script><script src="calendar.js"></script><script src="frame.js"></script><script src="stickers.js"></script><script src="voice.js"></script><script src="https://cdn.jsdelivr.net/npm/exifr@7.1.3/dist/lite.umd.js"></script><script src="upload.js"></script><script src="album.js"></script></body></html>

@@ -1,0 +1,10 @@
+const express = require('express'), http = require('http'), path = require('path'), { Server } = require('socket.io');
+const app = express(), srv = http.createServer(app), io = new Server(srv), PORT = process.env.PORT || 3000;
+app.disable('x-powered-by');
+app.use(express.json());
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'), { setHeaders: r => r.setHeader('X-Content-Type-Options', 'nosniff') }));
+app.use(express.static(path.join(__dirname, 'public')));
+require('./sockets')(io);
+app.use('/api', require('./routes')(io, require('./scheduler')(io)));
+app.use((err, q, s, n) => { console.error(err.message); s.sendStatus(err.status || (err.code === 'LIMIT_FILE_SIZE' ? 413 : 500)); });
+srv.listen(PORT, () => console.log(`http://localhost:${PORT}`));

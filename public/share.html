@@ -1,0 +1,41 @@
+<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SOULSHOOT</title>
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css"></head><body class="narrow">
+<a class="back" id="back" href="/">← กลับหน้าแรก</a>
+<header class="top"><div class="logo">✦</div><div><h1>SOULSHOOT</h1><p>Shared Moment</p></div></header>
+<h2 id="t">…</h2><div id="pic"><img id="im" alt=""></div>
+<div id="vbox" hidden><h3 class="sec">🔊 เสียงในเฟรมนี้</h3><button id="playall" type="button">▶ ฟังทุกเสียง</button><div id="vlist"></div></div>
+<a class="b" id="dl" download="soulshoot.png">ดาวน์โหลด</a><button id="cp">คัดลอกลิงก์</button>
+<script>
+back.onclick = e => { // มีประวัติในเว็บเราก็ย้อนกลับ ถ้าไม่ได้ (เช่น เปิดในแท็บใหม่) พาไปหน้าแรกแทน
+  e.preventDefault();
+  if (history.length > 1 && document.referrer.startsWith(location.origin)) { history.back(); setTimeout(() => { location.href = '/'; }, 500); }
+  else location.href = '/';
+};
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+let audio = null, playing = null, queue = [];
+function stopAll() { if (audio) { audio.pause(); audio = null; } document.querySelectorAll('.playing').forEach(x => x.classList.remove('playing')); playing = null; }
+function play(v, next) { // กดอีกครั้งเพื่อหยุด
+  if (playing === v.id && !next) return stopAll();
+  stopAll(); playing = v.id; audio = new Audio('/uploads/' + v.file);
+  document.querySelectorAll('[data-v="' + v.id + '"]').forEach(x => x.classList.add('playing'));
+  audio.onended = () => { const n = queue.shift(); stopAll(); if (n) play(n, true); };
+  audio.onerror = () => stopAll(); audio.play().catch(stopAll);
+}
+fetch('/api/share/' + new URLSearchParams(location.search).get('s')).then(r => r.ok ? r.json() : Promise.reject()).then(a => {
+  t.textContent = a.title; im.src = dl.href = '/uploads/' + a.file;
+  cp.onclick = () => navigator.clipboard.writeText(location.href).then(() => cp.textContent = 'คัดลอกแล้ว ✓');
+  const vm = Object.fromEntries((a.voices || []).map(v => [v.id, v]));
+  (a.hotspots || []).forEach(h => { // ป้ายเสียงบนเฟรม: วางปุ่มโปร่งใสทับตำแหน่งเดิม กดเพื่อฟัง
+    const v = vm[h.voiceId]; if (!v) return;
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'hs'; b.dataset.v = v.id; b.setAttribute('aria-label', 'ฟังเสียงของ ' + v.member);
+    b.style.cssText = `left:${h.x * 100}%;top:${h.y * 100}%;width:${h.s * 100}%;transform:translate(-50%,-50%) rotate(${h.r || 0}rad)`; b.onclick = () => play(v); pic.append(b);
+  });
+  if ((a.voices || []).length) {
+    vbox.hidden = false; vlist.innerHTML = '';
+    a.voices.forEach(v => { const r = document.createElement('div'); r.className = 'vr'; r.dataset.v = v.id; r.innerHTML = `<b>${esc(v.member)}</b><span>${Math.round(v.secs)} วิ</span>`;
+      const pb = document.createElement('button'); pb.type = 'button'; pb.textContent = '▶'; pb.setAttribute('aria-label', 'เล่นเสียงของ ' + v.member); pb.onclick = () => play(v); r.append(pb); vlist.append(r); });
+    playall.onclick = () => { queue = a.voices.slice(1); play(a.voices[0], true); };
+  }
+}).catch(() => t.textContent = 'ไม่พบ Moment นี้');
+</script>
+</body></html>
